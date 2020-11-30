@@ -1,0 +1,27 @@
+$my_tsmb_folders_list_page $mol_page
+	title \Shared Folders
+	tools /
+		<= Add $mol_link
+			arg *
+				folder \
+				danger null
+			hint \Add new share
+			sub /
+				<= Add_icon $mol_icon_plus
+		<= Close $mol_link
+			arg *
+				section null
+				folder null
+				danger null
+			hint \Close panel
+			sub /
+				<= Close_icon $mol_icon_cross
+	body /
+		<= Items $mol_list
+			rows <= items /
+			Empty <= Items_empty $mol_view
+				sub /
+					\No shares, create new one
+	Item!id $mol_link
+		arg <= item_arg!id *
+		title <= item_title!id \...

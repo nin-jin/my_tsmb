@@ -1,0 +1,10 @@
+$my_tsmb $mol_book2
+	plugins /
+		<= Theme $mol_theme_auto
+	Auth $my_tsmb_auth_form
+	Menu $my_tsmb_menu_page
+	Folders_list $my_tsmb_folders_list_page
+	Folders_item!id $my_tsmb_folders_page
+		id <= folder \
+	Danger $my_tsmb_folders_danger_page
+		id <= folder \

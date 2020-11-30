@@ -1,0 +1,32 @@
+$my_tsmb_menu_page $mol_page
+	id \
+	title \TSMB Admin
+	tools /
+		<= Lights $mol_lights_toggle
+	body /
+		<= Items $mol_list
+			rows <= items /
+				<= Item_globals $mol_link
+					arg *
+						section \globals
+						folder null
+						danger null
+					title \Global Parameters
+				<= Item_folders $mol_link
+					arg *
+						section \folders
+						folder null
+						danger null
+					title \Shared Folders
+				<= Item_printers $mol_link
+					arg *
+						section \printers
+						folder null
+						danger null
+					title \Shared Printers
+				<= Item_support $mol_link
+					arg *
+						section \support
+						folder null
+						danger null
+					title \Support

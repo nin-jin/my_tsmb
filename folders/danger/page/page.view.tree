@@ -1,0 +1,13 @@
+$my_tsmb_folders_danger_page $mol_page
+	id \
+	title \Danger actions
+	tools /
+		<= Close $mol_link
+			arg * danger null
+			hint \Close panel
+			sub /
+				<= Close_icon $mol_icon_cross
+	body /
+		<= Drop $mol_button_minor
+			title <= drop_label \Drop share {id}
+			click?val <=> drop?val null
