@@ -1,0 +1,520 @@
+$mol_scroll $mol_view
+	minimal_height 0
+	_event_scroll_timer?val null
+	field *
+		^
+		scrollTop <= scroll_top?val 0
+		scrollLeft <= scroll_left?val 0
+		tabIndex <= tabindex -1
+	event *
+		^
+		scroll?event <=> event_scroll?event null
+
+$mol_book2 $mol_scroll
+	sub <= pages /$mol_view
+	minimal_width 0
+	Placeholder $mol_view
+
+$mol_page $mol_view
+	sub /
+		<= Head $mol_view
+			sub <= head /
+				<= Title $mol_view
+					sub /
+						<= title
+				<= Tools $mol_view
+					sub <= tools /$mol_view_content
+		<= Body $mol_scroll
+			scroll_top?val <=> body_scroll_top?val 0
+			sub <= body /$mol_view_content
+		<= Foot $mol_view
+			sub <= foot /$mol_view
+
+$mol_hotkey $mol_plugin
+	event *
+		^
+		keydown?event <=> keydown?event null
+	key *
+	mod_ctrl false
+	mod_alt false
+	mod_shift false
+
+$mol_meter $mol_plugin
+	zoom 1
+	-
+	width?val 0
+	height?val 0
+	-
+	left?val 0
+	right?val 0
+	bottom?val 0
+	top?val 0
+
+$mol_pop $mol_view
+	event * keydown?event <=> keydown?event null
+	showed?val false
+	plugins /$mol_plugin
+		<= Meter $mol_meter
+			top => top
+			bottom => bottom
+			left => left
+			right => right
+	sub /
+		<= Anchor null
+		<= Bubble $mol_pop_bubble
+			align <= align \bottom_center
+			content <= bubble_content /$mol_view_content
+			height_max <= height_max 9999
+
+$mol_pop_bubble $mol_scroll
+	sub <= content /$mol_view_content
+	style *
+		^
+		maxHeight <= height_max 9999
+	attr *
+		^
+		mol_pop_align <= align \
+		tabindex 0
+
+$mol_speck $mol_view
+	attr *
+		^
+		mol_theme \$mol_theme_accent
+	style *
+		^
+		minHeight \1em
+	sub /
+		<= value null
+
+$mol_button $mol_view
+	enabled true
+	minimal_height 40
+	click?event null
+	event_click?event null
+	event *
+		^
+		click?event <=> event_activate?event null
+		keydown?event <=> event_key_press?event null 
+	attr *
+		^
+		disabled <= disabled false
+		role \button
+		tabindex <= tab_index 0
+		title <= hint_or_error <= hint \
+	sub /$mol_view_content
+		<= title
+	Speck $mol_speck
+
+$mol_button_typed $mol_button
+
+$mol_button_minor $mol_button_typed
+
+$mol_string $mol_view
+	dom_name \input
+	enabled true
+	minimal_height 40
+	autocomplete false
+	field *
+		^
+		disabled <= disabled false
+		value <= value_changed?val <=> value?val \
+		placeholder <= hint \
+		type <= type?val \text
+		spellcheck <= spellcheck false
+		autocomplete <= autocomplete_native \
+	attr *
+		^
+		maxlength <= length_max Infinity
+	event *
+		^
+		input?event <=> event_change?event null
+		keydown?event <=> event_key_press?event null
+	plugins /
+		<= Submit $mol_hotkey
+			key * enter?event <=> submit?event null
+
+$mol_svg $mol_view
+	dom_name \svg
+	dom_name_space \http://www.w3.org/2000/svg
+	font_size 16
+	font_family \
+
+$mol_svg_root $mol_svg
+	dom_name \svg
+	attr *
+		^
+		viewBox <= view_box \0 0 100 100
+		preserveAspectRatio <= aspect \xMidYMid
+
+$mol_svg_path $mol_svg
+	dom_name \path
+	attr *
+		^
+		d <= geometry \
+
+
+$mol_icon $mol_svg_root
+	view_box \0 0 24 24
+	minimal_width 16
+	minimal_height 16
+	sub /
+		<= Path $mol_svg_path
+			geometry <= path \
+
+$mol_icon_chevron $mol_icon path \M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z
+
+$mol_paragraph $mol_view
+	line_height 24
+	letter_width 8
+
+$mol_dimmer $mol_paragraph
+	haystack \
+	needle \
+	sub <= parts /$mol_view_content
+	Low!id $mol_paragraph
+		sub /
+			<= string!id \
+	High!id $mol_paragraph
+		sub /
+			<= string!id \
+
+$mol_nav $mol_plugin
+	cycle?val false
+	-
+	mod_ctrl false
+	mod_shift false
+	mod_alt false
+	-
+	keys_x?val /
+	keys_y?val /
+	-
+	current_x?val \
+	current_y?val \
+	-
+	event_up?event null
+	event_down?event null
+	event_left?event null
+	event_right?event null
+	event *
+		^
+		keydown?event <=> event_key?event null
+
+$mol_list $mol_view
+	render_visible_only true
+	render_over 0
+	sub <= rows /$mol_view
+	Empty $mol_view
+	Gap_before $mol_view style * paddingTop <= gap_before 0
+	Gap_after $mol_view style * paddingTop <= gap_after 0
+	view_window /
+		0
+		0
+
+$mol_select $mol_pop
+	dictionary *
+	options /string
+	value?val \
+	Option_row!id $mol_button_minor
+		event_click?event <=> event_select!id?event null
+		sub <= option_content!id /
+			<= Option_label!id $mol_dimmer
+				haystack <= option_label!id \
+				needle <= filter_pattern?val \
+	No_options $mol_view
+		sub /
+			<= no_options_message @ \No options
+	plugins /
+		^
+		<= Nav $mol_nav
+			keys_y <= nav_components /$mol_view
+			current_y?component <=> option_focused?component null
+			cycle?val <=> nav_cycle?val true
+	showed?val <=> options_showed?val false
+	Anchor <= Trigger $mol_button_minor
+		click?event <=> open?event null
+		sub <= trigger_content /$mol_view_content
+	bubble_content /
+		<= Menu $mol_list
+			rows <= menu_content /$mol_view
+	option_content_current /$mol_view_content
+	Filter $mol_string
+		value?val <=> filter_pattern?val \
+		hint <= filter_hint <= hint @ \Search..
+		submit?event <=> submit?event null
+		enabled <= enabled true
+	Trigger_icon $mol_icon_chevron
+
+$mol_labeler $mol_list
+	rows /
+		<= Label $mol_view
+			minimal_height 24
+			sub <= label /$mol_view_content
+				<= title
+		<= Content $mol_view
+			minimal_height 24
+			sub <= content /
+
+$mol_form_field $mol_labeler
+	label /
+		<= name \
+		<= Bid $mol_view
+			sub / <= bid \
+	Content <= control null
+
+$mol_button_major $mol_button_typed
+	attr *
+		^
+		mol_theme \$mol_theme_accent
+
+$mol_row $mol_view
+
+$mol_form $mol_view
+	submit_blocked false
+	event *
+		^
+		keydown?event <=> keydown?event null
+	submit?event null
+	sub /
+		<= Bar_fields $mol_view
+			sub <= form_fields /$mol_form_field
+		<= Bar_buttons $mol_row
+			sub <= buttons /$mol_view
+
+$my_tsmb_auth_form $mol_page
+	title \TSMB Control Panel
+	plugins /
+		<= Enter $mol_hotkey
+			key * enter?event <=> submit?event null
+	body /
+		<= Form $mol_form
+			form_fields /
+				<= Login_field $mol_form_field
+					name <= Login_name \Login
+					control <= Login $mol_select
+						value?val <=> login?val \admin
+						dictionary *
+							admin \Admin
+				<= Pass_field $mol_form_field
+					name <= Pass_name \Password
+					control <= Pass $mol_string
+						type \password
+						value?val <=> pass?val \password
+						enabled false
+			buttons /
+				<= Submit $mol_button_major
+					title <= Auth_label \Enter
+					click?val <=> auth?val null
+
+$mol_check $mol_button_minor
+	attr *
+		^
+		mol_check_checked <= checked?val false
+		aria-checked <= checked?val false
+		role \checkbox
+	sub /
+		<= Icon null
+		<= label /
+			<= Title $mol_view
+				sub /
+					<= title \
+
+$mol_check_icon $mol_check
+
+$mol_icon_brightness_6 $mol_icon path \M12,18V6C15.31,6 18,8.69 18,12C18,15.31 15.31,18 12,18M20,15.31L23.31,12L20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31Z
+
+$mol_lights_toggle $mol_check_icon
+	Icon <= Lights_icon $mol_icon_brightness_6
+	hint @ \Toggle lights
+	checked?val <=> lights?val false
+
+$mol_link $mol_view
+	dom_name \a
+	attr *
+		^
+		href <= uri \
+		title <= hint \
+		target <= target \_self
+		download <= file_name \
+		mol_link_current <= current false
+		mol_theme <= theme null
+	sub /$mol_view_content
+		<= title
+	arg *
+	event *
+		^
+		click?event <=> click?event <=> event_click?event null
+
+$my_tsmb_menu_page $mol_page
+	id \
+	title \TSMB Admin
+	tools /
+		<= Lights $mol_lights_toggle
+	body /
+		<= Items $mol_list
+			rows <= items /
+				<= Item_globals $mol_link
+					arg *
+						section \globals
+						folder null
+						danger null
+					title \Global Parameters
+				<= Item_folders $mol_link
+					arg *
+						section \folders
+						folder null
+						danger null
+					title \Shared Folders
+				<= Item_printers $mol_link
+					arg *
+						section \printers
+						folder null
+						danger null
+					title \Shared Printers
+				<= Item_support $mol_link
+					arg *
+						section \support
+						folder null
+						danger null
+					title \Support
+
+$mol_icon_plus $mol_icon path \M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z
+
+$mol_icon_cross $mol_icon path \M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z
+
+$my_tsmb_folders_list_page $mol_page
+	title \Shared Folders
+	tools /
+		<= Add $mol_link
+			arg *
+				folder \
+				danger null
+			hint \Add new share
+			sub /
+				<= Add_icon $mol_icon_plus
+		<= Close $mol_link
+			arg *
+				section null
+				folder null
+				danger null
+			hint \Close panel
+			sub /
+				<= Close_icon $mol_icon_cross
+	body /
+		<= Items $mol_list
+			rows <= items /
+			Empty <= Items_empty $mol_view
+				sub /
+					\No shares, create new one
+	Item!id $mol_link
+		arg <= item_arg!id *
+		title <= item_title!id \...
+
+$mol_icon_tick $mol_icon path \M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z
+
+$mol_check_box $mol_check
+	Icon $mol_icon_tick
+
+$mol_icon_alert $mol_icon path \M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z
+
+$mol_icon_alert_decagram $mol_icon path \M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M13,17H11V15H13V17M13,13H11V7H13V13Z
+
+$mol_icon_alert_decagram_outline $mol_icon path \M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7
+
+$my_tsmb_folders_page $mol_page
+	id \
+	title \Share {id}
+	tools /
+		<= Danger $mol_link
+			arg * danger \
+			hint \Danger actions
+			sub /
+				<= Danger_icon $mol_icon_alert_decagram_outline
+		<= Close $mol_link
+			arg *
+				folder null
+				danger null
+			hint \Close panel
+			sub /
+				<= Close_icon $mol_icon_cross
+	body /
+		<= Fields $mol_list
+			rows <= fields /
+	foot /
+		<= Save $mol_button_major
+			title \Save
+			enabled <= save_enabled true
+			click?val <=> save?val null
+	Field!id $mol_view
+	Field_text!id $mol_labeler
+		title <= field_title!id \
+		Content <= Field_text_control!id $mol_string
+			value?val <=> field_text!id?val \
+			enabled <= field_enabled!id true
+	Field_flag!id $mol_check_box
+		checked?val <=> field_flag!id?val false
+		title  <= field_title!id \
+		enabled <= field_enabled!id true
+
+$my_tsmb_folders_danger_page $mol_page
+	id \
+	title \Danger actions
+	tools /
+		<= Close $mol_link
+			arg * danger null
+			hint \Close panel
+			sub /
+				<= Close_icon $mol_icon_cross
+	body /
+		<= Drop $mol_button_minor
+			title <= drop_label \Drop share {id}
+			click?val <=> drop?val null
+
+$mol_theme_auto $mol_plugin
+	attr * mol_theme <= theme \
+
+$my_tsmb $mol_book2
+	plugins /
+		<= Theme $mol_theme_auto
+	Auth $my_tsmb_auth_form
+	Menu $my_tsmb_menu_page
+	Folders_list $my_tsmb_folders_list_page
+	Folders_item!id $my_tsmb_folders_page
+		id <= folder \
+	Danger $my_tsmb_folders_danger_page
+		id <= folder \
+
+$mol_view_tree_test_attributes_super $mol_view
+	some *
+		a 0
+		b 2
+
+$mol_view_tree_test_attributes $mol_view_tree_test_attributes_super
+	some *
+		^
+		a 1
+
+$mol_view_tree_test_binding $mol_view
+	value?val <=> task_title_new?val \123
+	enabled <= head_complete_enabled false
+
+$mol_view_tree_test_binding_right $mol_view
+	Test $mol_view_tree_test_binding_right_test
+		width?v => outer_width?v
+
+$mol_view_tree_test_binding_right_test $mol_view
+	width?val 0
+
+$mol_view_tree_test_simple $mol_view
+	some 1
+	bool true
+	str \test
+	arr /
+	arr_string /string
+
+$mol_view_tree_test_attributes_subcomponent $mol_view
+	- Comment
+	Page!index $mol_view_tree_test_attributes_subcomponent_page
+		Sub <= page!index null
+
+$mol_view_tree_test_attributes_subcomponent_page $mol_view
+	Sub null
