@@ -9,8 +9,12 @@ namespace $.$$ {
 			return Object.keys( this.folders() ).map( name => this.Item( name ) )
 		}
 
-		item_title( name: string ) {
+		item_id( name: string ) {
 			return this.folders()[ name ].name
+		}
+
+		item_path( name: string ) {
+			return this.folders()[ name ].path
 		}
 
 		item_arg( name: string ) {

@@ -2,6 +2,8 @@ $my_tsmb_menu_page $mol_page
 	id \
 	title \TSMB Admin
 	tools /
+		<= Sources $mol_link_source
+			uri \http://github.com/nin-jin/my_tsmb/
 		<= Lights $mol_lights_toggle
 	body /
 		<= Items $mol_list

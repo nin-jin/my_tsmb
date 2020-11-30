@@ -45,7 +45,9 @@ namespace $.$$ {
 
 		@ $mol_mem
 		keys_editable() {
-			return Object.keys( this.folder() ).filter( key => key !== 'name' )
+			let keys = Object.keys( this.folder() )
+			if( this.id() ) keys = keys.filter( key => key !== 'name' )
+			return keys
 		}
 
 		fields() {
@@ -109,7 +111,7 @@ namespace $.$$ {
 				req[ key ] = String( folder[ key ] )
 			}
 			
-			let id = $mol_fiber.run( ()=> this.id() || $mol_guid() )
+			let id = $mol_fiber.run( ()=> this.id() || folder.name || $mol_guid() )
 			folder.name = id
 			const uri = `share/${id}`
 

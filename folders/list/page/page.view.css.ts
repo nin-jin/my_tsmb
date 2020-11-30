@@ -12,6 +12,10 @@ namespace $.$$ {
 			padding: $mol_gap.block,
 		},
 
+		Item: {
+			justifyContent: 'space-between'
+		},
+
 		Items_empty: {
 			padding: rem(1.5),
 		},
